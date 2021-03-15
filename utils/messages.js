@@ -1,4 +1,4 @@
-const generateMessage = (user, message) => {
+const generateMessage = (user, message, room) => {
   let today = new Date();
   let hour = today.getHours();
   let minute = today.getMinutes();
@@ -13,6 +13,7 @@ const generateMessage = (user, message) => {
   return {
     user,
     message,
+    room,
     createdAt: date,
   };
 };

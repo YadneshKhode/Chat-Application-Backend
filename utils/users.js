@@ -1,8 +1,8 @@
 const users = [];
 
-const addUser = ({ id, username, room, displayPhoto }) => {
+const addUser = ({ id, username, room, displayPhoto, email }) => {
   //clean data
-  username = username.trim().toLowerCase();
+  // username = username.trim().toLowerCase();
   room = room.trim().toLowerCase();
   //validate data
   if (!username || !room) {
@@ -12,17 +12,17 @@ const addUser = ({ id, username, room, displayPhoto }) => {
   }
   //check for existing user
   const existingUser = users.find((user) => {
-    return user.room === room && user.username === username;
+    return user.room === room && user.email === email;
   });
-
   //validate username
-  if (existingUser) {
-    return {
-      error: "Username is in use!!",
-    };
-  }
+  // if (existingUser) {
+  //   return {user}
+  // }
   //Store
-  const user = { id, username, room, displayPhoto };
+  const user = { id, username, room, displayPhoto, email };
+  if (existingUser) {
+    return {user}
+  }
   users.push(user);
   return { user };
 };
@@ -30,8 +30,16 @@ const addUser = ({ id, username, room, displayPhoto }) => {
 const removeUser = (id) => {
   const index = users.findIndex((user) => user.id === id);
   if (index !== -1) {
-    return users.splice(index, 1)[0]; // splice returns array and we want first user object so[0]
+    return users.splice(index, 1)[0]; // splice returns array and we want the removed  user object so[0] splice resaves removed object in 0th index
   }
+};
+const removeUserFromRoom = (id) => {
+  const index = users.findIndex((user) => user.id === id);
+  if (index !== -1) {
+    users[index].room = null;
+    return;
+  }
+  return;
 };
 
 const getUser = (id) => {
@@ -46,4 +54,5 @@ module.exports = {
   removeUser,
   getUser,
   getUsersInRoom,
+  removeUserFromRoom
 };
