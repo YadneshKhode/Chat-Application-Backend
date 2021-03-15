@@ -15,7 +15,7 @@ module.exports = {
       repo : 'https://github.com/YadneshKhode/Chat-Application-Backend.git',
       path : 'DESTINATION_PATH',
       'pre-deploy-local': '',
-      'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
+      // 'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
       'pre-setup': ''
     }
   }
