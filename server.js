@@ -22,7 +22,6 @@ const {
   removeUser,
   getUser,
   getUsersInRoom,
-  removeUserFromRoom,
 } = require("./utils/users");
 const { generateMessage } = require("./utils/messages");
 app.use(express.json());
