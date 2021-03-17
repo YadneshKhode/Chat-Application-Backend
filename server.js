@@ -59,12 +59,14 @@ io.on("connect", (socket) => {
       users: getUsersInRoom(user.room),
     });
     // triggered when user joins room
-    socket.broadcast
-      .to(user.room)
-      .emit(
-        "message",
-        generateMessage("Admin", `${user.username} has joined!`, room)
-      );
+    if (user) {
+      socket.broadcast
+        .to(user.room)
+        .emit(
+          "message",
+          generateMessage("Admin", `${user.username} has joined!`, room)
+        );
+    }
     io.to(user.room).emit("roomData", {
       users: getUsersInRoom(user.room),
     });
@@ -76,42 +78,55 @@ io.on("connect", (socket) => {
 
   socket.on("sendMessage", (message, callback) => {
     const user = getUser(socket.id);
-
-    io.to(user.room).emit(
-      "message",
-      generateMessage(user.username, message, user.room)
-    );
+    if (user) {
+      io.to(user.room).emit(
+        "message",
+        generateMessage(user.username, message, user.room)
+      );
+    }
     callback();
   });
 
-  // socket.on("disconnect", () => {
-  //   const user = removeUser(socket.id);
-  //   if (user) {
-  //     io.to(user.room).broadcast(
-  //       "message",
-  //       generateMessage("Admin", `${user.username} has left !`, user.room)
-  //     );
-  //     io.to(user.room).emit("roomData", {
-  //       users: getUsersInRoom(user.room),
-  //     });
-  //   }
-  // });
-
-  //used to remove user when user leaves room
-
-  socket.on("leftRoom", () => {
-    const user = removeUserFromRoom(socket.id);
+  socket.on("disconnect", () => {
+    const user = removeUser(socket.id);
     if (user) {
-      io.to(user.room).broadcast(
+      io.to(user.room).emit(
         "message",
         generateMessage("Admin", `${user.username} has left !`, user.room)
       );
+      io.to(user.room).emit("roomData", {
+        users: getUsersInRoom(user.room),
+      });
     }
   });
+  socket.on("loggedOut", () => {
+    const user = removeUser(socket.id);
+    console.log("loggedOut");
+    console.log(user);
+    if (user) {
+      io.to(user.room).emit(
+        "message",
+        generateMessage("Admin", `${user.username} has left !`, user.room)
+      );
+      io.to(user.room).emit("roomData", {
+        users: getUsersInRoom(user.room),
+      });
+    }
+  });
+
+  //used to remove user when user leaves room
+
+  socket.on("leftRoom", (room, username) => {
+    const user = getUser(socket.id);
+    console.log(user);
+
+    io.to(room).emit(
+      "message",
+      generateMessage("Admin", username + "has  left !", room)
+    );
+  });
 });
-app.get("/*", function (req, res) {
-  res.send("error from server");
-});
+
 server.listen(port, () => {
   console.log(`The server is up and running on port ${port}`);
 });
