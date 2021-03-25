@@ -30,7 +30,7 @@ app.use(cors());
 
 //automatically triggered after scoket.join is called
 
-io.on("connect", (socket) => {
+io.on("connection", (socket) => {
   socket.on("join", ({ username, room, displayPhoto, email }, callback) => {
     const { error, user } = addUser({
       id: socket.id,
