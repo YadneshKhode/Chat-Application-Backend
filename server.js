@@ -12,8 +12,8 @@ const {
 const { generateMessage } = require("./utils/messages");
 const path = require("path");
 const app = express();
-const server = http.createServer(app);
 app.use(cors());
+const server = http.createServer(app);
 const io = socketio(server, {
   cors: {
     origin: "*",
