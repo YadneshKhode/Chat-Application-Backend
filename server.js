@@ -159,7 +159,9 @@ const { generateMessage } = require("./utils/messages");
 app.use(express.json());
 app.use(express.static(publicDirectoryPath));
 app.use(cors());
+
 //automatically triggered after scoket.join is called
+
 io.on("connect", (socket) => {
   socket.on("join", ({ username, room, displayPhoto, email }, callback) => {
     const { error, user } = addUser({
@@ -172,7 +174,9 @@ io.on("connect", (socket) => {
     if (error) {
       return callback(error);
     }
+
     socket.join(user.room); //emits only to those who are in this room in other words adds this specific connection ( socket ) into the room.
+
     // triggered when user joins new room
     socket.emit(
       "message",
@@ -186,69 +190,59 @@ io.on("connect", (socket) => {
       users: getUsersInRoom(user.room),
     });
     // triggered when user joins room
-    if (user) {
-      socket.broadcast
-        .to(user.room)
-        .emit(
-          "message",
-          generateMessage("Admin", `${user.username} has joined!`, room)
-        );
-    }
+    socket.broadcast
+      .to(user.room)
+      .emit(
+        "message",
+        generateMessage("Admin", `${user.username} has joined!`, room)
+      );
     io.to(user.room).emit("roomData", {
       users: getUsersInRoom(user.room),
     });
+
     callback();
+  });
 
-    socket.on("sendMessage", (message, callback) => {
-      const user = getUser(socket.id);
-      if (user) {
-        io.to(user.room).emit(
-          "message",
-          generateMessage(user.username, message, user.room)
-        );
-      }
-      callback();
-    });
-    socket.on("disconnect", () => {
-      const user = removeUser(socket.id);
-      if (user) {
-        io.to(user.room).emit(
-          "message",
-          generateMessage("Admin", `${user.username} has left !`, user.room)
-        );
-        io.to(user.room).emit("roomData", {
-          users: getUsersInRoom(user.room),
-        });
-      }
-    });
-    socket.on("loggedOut", () => {
-      const user = removeUser(socket.id);
-      console.log("loggedOut");
-      console.log(user);
-      if (user) {
-        io.to(user.room).emit(
-          "message",
-          generateMessage("Admin", `${user.username} has left !`, user.room)
-        );
-        io.to(user.room).emit("roomData", {
-          users: getUsersInRoom(user.room),
-        });
-      }
-    });
+  //Triggered after sending message
 
-    //used to remove user when user leaves room
+  socket.on("sendMessage", (message, callback) => {
+    const user = getUser(socket.id);
 
-    socket.on("leftRoom", (room, username) => {
-      const user = getUser(socket.id);
-      console.log(user);
+    io.to(user.room).emit(
+      "message",
+      generateMessage(user.username, message, user.room)
+    );
+    callback();
+  });
 
-      io.to(room).emit(
+  // socket.on("disconnect", () => {
+  //   const user = removeUser(socket.id);
+  //   if (user) {
+  //     io.to(user.room).broadcast(
+  //       "message",
+  //       generateMessage("Admin", `${user.username} has left !`, user.room)
+  //     );
+  //     io.to(user.room).emit("roomData", {
+  //       users: getUsersInRoom(user.room),
+  //     });
+  //   }
+  // });
+
+  //used to remove user when user leaves room
+
+  socket.on("leftRoom", () => {
+    const user = removeUserFromRoom(socket.id);
+    if (user) {
+      io.to(user.room).broadcast(
         "message",
-        generateMessage("Admin", username + "has  left !", room)
+        generateMessage("Admin", `${user.username} has left !`, user.room)
       );
-    });
+    }
   });
-  server.listen(port, () => {
-    console.log(`The server is up and running on port ${port}`);
-  });
+});
+app.get("/*", function (req, res) {
+  res.send("error from server");
+});
+server.listen(port, () => {
+  console.log(`The server is up and running on port ${port}`);
 });
