@@ -2,29 +2,34 @@ const http = require("http");
 const express = require("express");
 const socketio = require("socket.io");
 const cors = require("cors");
-const app = express();
-app.use(cors());
-const server = http.createServer(app);
-const io = socketio(server, {
-  cors: {
-    origin: "*",
-  },
-});
 const router = require("./router");
-app.use(router);
 const {
   addUser,
   removeUser,
   getUser,
   getUsersInRoom,
 } = require("./utils/users");
-const port = process.env.PORT || 5000;
+const { generateMessage } = require("./utils/messages");
 const path = require("path");
+const app = express();
+const server = http.createServer(app);
+var corsOptions = {
+  origin: ["https://yadnesh-chat-app.netlify.app/"],
+  credentials: true,
+  methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
+};
+app.use(cors(corsOptions));
+const io = socketio(server, {
+  cors: {
+    origin: "*",
+  },
+});
+app.use(router);
+const port = process.env.PORT || 5000;
 const publicDirectoryPath = path.join(
   __dirname,
   "../chat-application/client/public"
 );
-const { generateMessage } = require("./utils/messages");
 app.use(express.json());
 app.use(express.static(publicDirectoryPath));
 
