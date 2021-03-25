@@ -26,7 +26,7 @@ const publicDirectoryPath = path.join(
   
   //automatically triggered after scoket.join is called
 
-  io.on("connection", (socket) => {
+  io.on("connect", (socket) => {
     socket.on("join", ({ username, room, displayPhoto, email }, callback) => {
       const { error, user } = addUser({
         id: socket.id,
