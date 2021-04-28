@@ -13,8 +13,11 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "express": "^4.17.1",
     "moment": "^2.29.1",
+    "razorpay": "^2.0.6",
+    "shortid": "^2.2.16",
     "socket.io": "^4.0.0"
   },
   "devDependencies": {
